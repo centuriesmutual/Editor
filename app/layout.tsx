@@ -7,6 +7,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Newspaper Editor CMS',
   description: 'Enterprise-level newspaper editor CMS powered by Box.com',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({

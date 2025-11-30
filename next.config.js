@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Ensure proper routing
+  trailingSlash: false,
+  // Optimize for production
+  poweredByHeader: false,
+  // Environment variables
   env: {
     BOX_CLIENT_ID: process.env.BOX_CLIENT_ID,
     BOX_CLIENT_SECRET: process.env.BOX_CLIENT_SECRET,
