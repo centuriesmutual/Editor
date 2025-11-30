@@ -8,7 +8,7 @@ const nextConfig = {
     JWT_SECRET: process.env.JWT_SECRET,
     API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3000',
     NEWSPAPER_DOMAIN: process.env.NEWSPAPER_DOMAIN || 'newspaper.centuriesmutual.com'
-  }
+  },
 }
 
 module.exports = nextConfig
