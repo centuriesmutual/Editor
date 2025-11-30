@@ -1,19 +1,32 @@
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+'use client';
 
-export default async function Home() {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth-token');
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check for auth token
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('auth-token='))
+      ?.split('=')[1];
 
     if (token) {
-      redirect('/dashboard');
+      router.replace('/dashboard');
     } else {
-      redirect('/login');
+      router.replace('/login');
     }
-  } catch (error) {
-    // Fallback to login if there's any error
-    redirect('/login');
-  }
+  }, [router]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
 }
 
