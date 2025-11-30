@@ -2,39 +2,50 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Allow API routes and static files
-  if (
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/static') ||
-    pathname.includes('.')
-  ) {
+  try {
+    const { pathname } = request.nextUrl;
+    
+    // Allow API routes, static files, and Next.js internals
+    if (
+      pathname.startsWith('/api') ||
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/static') ||
+      pathname.startsWith('/favicon') ||
+      pathname.includes('.') ||
+      pathname === '/robots.txt'
+    ) {
+      return NextResponse.next();
+    }
+
+    // Get auth token safely
+    const token = request.cookies.get('auth-token')?.value;
+
+    // Handle root path - let the page component handle redirect
+    if (pathname === '/') {
+      return NextResponse.next();
+    }
+
+    // Allow login page access
+    if (pathname === '/login') {
+      // Redirect authenticated users away from login
+      if (token) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
+      return NextResponse.next();
+    }
+
+    // Protect dashboard and other routes
+    if (!token) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    return NextResponse.next();
+  } catch (error) {
+    // If middleware fails, allow the request to proceed
+    // This prevents middleware from breaking the entire app
+    console.error('Middleware error:', error);
     return NextResponse.next();
   }
-
-  // Allow login page
-  if (pathname === '/login') {
-    return NextResponse.next();
-  }
-
-  // Check for auth token
-  const token = request.cookies.get('auth-token')?.value;
-
-  // Redirect to login if no token and trying to access protected routes
-  if (!token && pathname !== '/login' && pathname !== '/') {
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // Redirect authenticated users away from login page
-  if (token && pathname === '/login') {
-    const dashboardUrl = new URL('/dashboard', request.url);
-    return NextResponse.redirect(dashboardUrl);
-  }
-
-  return NextResponse.next();
 }
 
 export const config = {
@@ -45,8 +56,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - robots.txt
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt).*)',
   ],
 };
 
