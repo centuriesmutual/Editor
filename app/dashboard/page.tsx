@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Image from 'next/image';
 import {
   FileText,
   LogOut,
@@ -53,11 +54,7 @@ export default function DashboardPage() {
     resolver: zodResolver(articleSchema),
   });
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/me');
       if (response.ok) {
@@ -71,7 +68,11 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -308,10 +309,13 @@ export default function DashboardPage() {
                 <div className="mt-4 grid grid-cols-3 gap-4">
                   {images.map((img, index) => (
                     <div key={index} className="relative">
-                      <img
+                      <Image
                         src={img.base64}
                         alt={img.filename}
+                        width={128}
+                        height={128}
                         className="w-full h-32 object-cover rounded-lg border"
+                        unoptimized
                       />
                       <button
                         type="button"

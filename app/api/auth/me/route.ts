@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authMiddleware } from '@/lib/middleware';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const user = authMiddleware(request);

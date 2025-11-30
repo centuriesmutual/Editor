@@ -3,6 +3,8 @@ import { authMiddleware, requireRole } from '@/lib/middleware';
 import { uploadFileToBox, createFolder } from '@/lib/box';
 import axios from 'axios';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const user = authMiddleware(request);
