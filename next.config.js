@@ -9,6 +9,23 @@ const nextConfig = {
     API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3000',
     NEWSPAPER_DOMAIN: process.env.NEWSPAPER_DOMAIN || 'newspaper.centuriesmutual.com'
   },
+  webpack: (config, { isServer }) => {
+    // Ignore optional dependencies that aren't needed
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      'coffee-script': false,
+    };
+    
+    // Ignore vm2 warnings (it's a server-side only dependency)
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'vm2': false,
+      };
+    }
+    
+    return config;
+  },
 }
 
 module.exports = nextConfig
